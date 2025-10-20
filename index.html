@@ -1,1 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Counter dApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h1>Counter dApp</h1>
+  <button id="connect">Connect MetaMask</button>
+  <div>
+    <button id="read">get()</button>
+    <span id="value">?</span>
+  </div>
+  <div>
+    <button id="inc">increment()</button>
+    <button id="dec">decrement()</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script>
+    // TODO: replace these two with your real values from Remix:
+    const CONTRACT_ADDRESS = "PASTE_YOUR_ADDRESS_HERE";
+    const ABI = PASTE_YOUR_ABI_ARRAY_HERE;
+
+    let provider, signer, contract;
+
+    async function connect() {
+      if (!window.ethereum) { alert("Install MetaMask"); return; }
+      await ethereum.request({ method: "eth_requestAccounts" });
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      alert("Connected: " + await signer.getAddress());
+    }
+
+    async function readValue() {
+      if (!contract) return alert("Connect first");
+      const v = await contract.get();
+      document.getElementById("value").textContent = v.toString();
+    }
+
+    async function inc() {
+      if (!contract) return alert("Connect first");
+      const tx = await contract.increment();
+      await tx.wait();
+      await readValue();
+    }
+
+    async function dec() {
+      if (!contract) return alert("Connect first");
+      const tx = await contract.decrement();
+      await tx.wait();
+      await readValue();
+    }
+
+    document.getElementById("connect").onclick = connect;
+    document.getElementById("read").onclick = readValue;
+    document.getElementById("inc").onclick = inc;
+    document.getElementById("dec").onclick = dec;
+  </script>
+</body>
+</html>
 
